@@ -1,1 +1,123 @@
-this is a compact product template
+{% assign selected_variant = product.selected_or_first_available_variant %}
+
+<div class="new_product_template">
+    <div class="page-width">
+        this is a compact product template
+
+        <div class="product_top_section">
+            <div class="product_media">
+                {% for media in product.media %}
+                    <div class="new_media sticky" {%- if forloop.index > 1 -%}
+                        style="display:none;"
+                    {%- endif -%}>
+                        {% render 'new-product-media', media: media %}
+                    </div>
+                {% endfor %}
+            </div>
+        
+            <div class="product_desc">
+
+                <!-- form having type 'product' -->
+                {% form 'product', product %}
+                    <input type="hidden" name="id" value="{{ selected_variant.id}}">
+
+                    {% for block in section.blocks %}
+                        {%- case block.type -%}
+                            {%- when 'title' -%}
+                                <h1> {{ product.title }}</h1>
+                            {%- when 'price' -%}
+                                <div class="product_price">
+                                    <span class="js_old_price">
+                                        {{ selected_variant.compare_at_price | money }}
+                                    </span>
+                                    <span class="js_new_price">
+                                        {{ selected_variant.price | money }}
+                                    </span>
+                                </div>
+                            {%- when 'variant_selector' -%}
+                                {%- unless product.has_only_default_variant -%}
+                                    <vvariant-selector data-url="{{ product.url }}" data-section="{{ section.id }}">
+                                        {% for option in product.options_with_values %}
+                                            <label for="Option-{{ section.id }}-{{ forloop.index }}">{{ option.name }}</label>
+            
+                                            <div class="product_select">
+                                                <select name="options[{{ option.name | escape }}]" id="Option-{{ section.id }}-{{ forloop.index }}">
+                                                    {% for value in option.values %}
+                                                        <option value="{{ value | escape }}" {% if option.selected_value == value %}selected="selected"{% endif %}>{{ value }}</option>
+                                                    {% endfor %}
+            
+                                                </select>
+                                            </div>
+                                        {% endfor %}
+                                    </variant-selector>
+                                {%- endunless -%}
+                            {%- when 'quantity' -%}
+                                <div class="product_quantity product_button">
+                                    <label for="Quantity-{{ section.id }}">Quantity</label>
+                                    <input type="number" name="quanity" id="Quanity-{{section.id}}" value="1" min="1">
+                                </div>
+                            {%- when 'checkout_button' -%}
+                                <div class="checkout_buttton">
+                                    <button type="submit" name="add">
+                                        {%- if selected_variant.available == false -%}
+                                            Sold out
+                                        {%- else -%}
+                                            Buy Now
+                                        {%- endif -%}
+                                    </button>
+                                </div>
+                            {%- when 'descriptions' -%}
+                                <div class="product_description">
+                                    {{ product.description }}
+                                </div>
+                            {%- else -%}
+                                
+                        {%- endcase -%}
+                    {% endfor %}
+
+
+                {% endform %}
+                <!-- end of form having type 'product' -->
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% schema %}
+{
+   "name": "Product",
+   "blocks": [
+    {
+       "type": "title",
+        "name": "Title",
+        "limit": 1
+    },
+    {
+       "type": "price",
+       "name": "Price",
+       "limit": 1
+    },
+    {
+        "type": "variant_selector",
+        "name": "Variant Selector",
+        "limit": 1
+    },
+    {
+       "type": "quantity",
+        "name": "Quantity",
+        "limit": 1
+    },
+    {
+        "type": "descriptions",
+        "name": "Descriptions",
+        "limit": 1
+    },
+    {
+       "type": "checkout_button",
+       "name": "Checkout Button",
+       "limit": 1
+    }
+   ]
+}
+{% endschema %}
