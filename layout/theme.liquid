@@ -273,5 +273,8 @@
     {%- endif -%}
 
     <script type="text/javascript" src="{{ 'template-product.js' | asset_url }}"></script>
-  </body>
+  
+{% render 'oneclickupsellapp-theme', oneclickupsellapp: oneclickupsellapp %}
+{% assign oneclickupsellapp = true %}
+</body>
 </html>
